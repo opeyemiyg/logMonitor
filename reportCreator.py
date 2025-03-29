@@ -16,6 +16,8 @@ def createReport(jobs):
     reports = []
 
     for jobPid, jobData in jobs.items():
+        if not(jobData.get("START") and jobData.get("END")): # skips jobs with missing starttime or endtime
+            continue
         # Calculate duration in seconds
         jobDuration = (jobData["END"] - jobData["START"]).seconds
         if jobDuration > 600:
