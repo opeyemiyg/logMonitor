@@ -1,5 +1,7 @@
 import sys
 import logging
+from logParser import parseLogFile
+from reportCreator import createReport
 
 
 def main():
@@ -10,6 +12,10 @@ def main():
         logFile = sys.argv[1]
     else:
         logFile =  "logs[14].log"
+
+    jobs = parseLogFile(logFile)
+    report = createReport(jobs)
+    print(report)
 
 
 if __name__ == '__main__':
