@@ -38,5 +38,21 @@ class TestReportGenerator(unittest.TestCase):
         report = createReport(jobs)
         self.assertEqual(report, "")
 
+    def test_job_under_5_minutes(self):
+        jobs = {
+            "76512": {
+                "START": datetime.datetime.strptime("15:00:00", "%H:%M:%S"),
+                "END": datetime.datetime.strptime("15:03:00", "%H:%M:%S"),
+                "description": "Scheduled task A"
+            },
+            "46213": {
+                "START": datetime.datetime.strptime("15:10:00", "%H:%M:%S"),
+                "END": datetime.datetime.strptime("15:12:00", "%H:%M:%S"),
+                "description": "Scheduled task B"
+            }
+        }
+        report = createReport(jobs)
+        self.assertEqual(report, "")
+
 if __name__ == '__main__':
     unittest.main()
