@@ -25,9 +25,10 @@ def parseLogFile(filePath):
         jobs = {}
         reader = csv.reader(csvFile)
 
-        for rowNumber, row in enumerate(reader, start=1):
+        for row in reader:
             if not row:
                 continue
+            row = [column.strip() for column in row]
             if len(row) != 4:
                 continue
 
