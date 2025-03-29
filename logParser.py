@@ -25,11 +25,12 @@ def parseLogFile(filePath):
         jobs = {}
         reader = csv.reader(csvFile)
 
-        for row in reader:
+        for rowNumber, row in enumerate(reader, start=1):
             if not row:
                 continue
             row = [column.strip() for column in row]
             if len(row) != 4:
+                logging.warning(f"Unexpected job format in row number {rowNumber}: {row}")
                 continue
 
             jobTimeStr, jobDescr, jobStatus, jobPid = row[0], row[1], row[2], row[3]
@@ -38,6 +39,7 @@ def parseLogFile(filePath):
             try:
                 jobTime = datetime.strptime(jobTimeStr, "%H:%M:%S") # expecting format HH:MM:SS
             except ValueError as e:
+                logging.error("Timestamp format error in row number {rowNumber}:{row} {e}")
                 continue
 
             # checks if jobPid has been stored, otherwise tracks the job information
@@ -47,7 +49,13 @@ def parseLogFile(filePath):
             jobStatus = jobStatus.upper()
             # records the timestamp as start time for START status and end time for END status
             if jobStatus == "START":
+                if jobs[jobPid].get("START"):
+                    logging.warning("Job PID {jobPid} has multiple START entries. Overwriting previous start.")
                 jobs[jobPid]["START"] = jobTime
             elif jobStatus == "END":
+                if jobs[jobPid].get("END"):
+                    logging.warning("Job PID {jobPid} has multiple END entries. Overwriting previous start.")
                 jobs[jobPid]["END"] = jobTime
+            else:
+                logging.warning("Unexpected status '{jobStatus}' in row number {rowNumber}: {row}")
         return jobs
