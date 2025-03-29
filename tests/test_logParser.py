@@ -62,3 +62,27 @@ class TestLogParser(unittest.TestCase):
         self.assertIsNotNone(jobs["76512"]["END"])
         self.assertIsNotNone(jobs["88912"]["START"])
         self.assertIsNotNone(jobs["88912"]["END"])
+
+    def test_duplicate_start_entries(self):
+        # duplicate START entries overwrites earlier entry
+        sampleCsv = (
+            "15:00:00,Scheduled task A,START,76512\n"
+            "16:02:00,Scheduled task A,START,76512\n"
+            "17:06:00,Scheduled task A,END,76512\n"
+        )
+        fileObj = io.StringIO(sampleCsv)
+        jobs = parseLogFileHelper(fileObj)
+        # second entry is used as start time
+        self.assertEqual(jobs["76512"]["START"].strftime("%H:%M:%S"), "16:02:00")
+
+    def test_duplicate_end_entries(self):
+        # duplicate END entries overwrites earlier entry
+        sampleCsv = (
+            "15:00:00,Scheduled task A,START,76512\n"
+            "16:02:00,Scheduled task A,END,76512\n"
+            "17:06:00,Scheduled task A,END,76512\n"
+        )
+        fileObj = io.StringIO(sampleCsv)
+        jobs = parseLogFileHelper(fileObj)
+        # second entry is used as end time
+        self.assertEqual(jobs["76512"]["END"].strftime("%H:%M:%S"), "17:06:00")
