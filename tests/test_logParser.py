@@ -1,6 +1,6 @@
 import io
 import unittest
-from logParser import parseLogFile
+from logParser import parseLogFileHelper
 
 class TestLogParser(unittest.TestCase):
     def test_parse_valid_log(self):
@@ -10,7 +10,7 @@ class TestLogParser(unittest.TestCase):
             "15:06:00,Scheduled task A, END,76512"
         )
         fileObj = io.StringIO(sampleCsv)
-        jobs = parseLogFile(fileObj)
+        jobs = parseLogFileHelper(fileObj)
         self.assertIn("76512", jobs)
         self.assertEqual(jobs["76512"]["START"].strftime("%H:%M:%S"), "15:00:00")
         self.assertEqual(jobs["76512"]["END"].strftime("%H:%M:%S"), "15:06:00")
@@ -19,7 +19,7 @@ class TestLogParser(unittest.TestCase):
     def test_invalid_timestamp(self):
         sampleCsv = "invalid_time,Scheduled task A, START,76512\n"
         fileObj = io.StringIO(sampleCsv)
-        jobs = parseLogFile(fileObj)
+        jobs = parseLogFileHelper(fileObj)
         # no valid row due to invalid timestamp
         self.assertEqual(jobs, {})
 
@@ -31,7 +31,7 @@ class TestLogParser(unittest.TestCase):
             "12:10:00,Scheduled task B,START,44213\n"         # Valid
         )
         fileObj = io.StringIO(sampleCsv)
-        jobs = parseLogFile(fileObj)
+        jobs = parseLogFileHelper(fileObj)
         # Only the valid row should be parsed.
         self.assertEqual(set(jobs.keys()), {"44213"})
 
@@ -39,7 +39,7 @@ class TestLogParser(unittest.TestCase):
         # entry with only START should result in an incomplete job.
         sampleCsv = "15:00:00,Scheduled task A,START,76512\n"
         fileObj = io.StringIO(sampleCsv)
-        jobs = parseLogFile(fileObj)
+        jobs = parseLogFileHelper(fileObj)
         self.assertIn("76512", jobs)
         self.assertIsNotNone(jobs["76512"]["START"])
         self.assertIsNone(jobs["76512"]["END"])
@@ -55,7 +55,7 @@ class TestLogParser(unittest.TestCase):
             "16:20:00,Scheduled task C,START\n"                 # Invalid row format.
         )
         fileObj = io.StringIO(sampleCsv)
-        jobs = parseLogFile(fileObj)
+        jobs = parseLogFileHelper(fileObj)
         # Only valid entries should be processed: PIDs 76512 and 88912.
         self.assertEqual(set(jobs.keys()), {"76512", "88912"})
         self.assertIsNotNone(jobs["76512"]["START"])
