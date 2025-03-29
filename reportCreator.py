@@ -21,9 +21,9 @@ def createReport(jobs):
         # Calculate duration in seconds
         jobDuration = (jobData["END"] - jobData["START"]).seconds
         if jobDuration > 600:
-            line = "[ERROR]: exceeded 10 minutes]"
+            line = "[ERROR]: exceeded 10 minutes"
         elif jobDuration > 300:
-            line = "[WARNING]: exceeded 5 minutes]"
+            line = "[WARNING]: exceeded 5 minutes"
         else:
             continue # job is less than 10minutes and less than 5 minutes
         line += f"PID {jobPid}: Duration {jobDuration} seconds "
