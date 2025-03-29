@@ -13,7 +13,12 @@ def main():
     else:
         logFile =  "logs[14].log"
 
-    jobs = parseLogFile(logFile)
+    try:
+        jobs = parseLogFile(logFile)
+    except FileNotFoundError:
+        logging.error(f"{logFile} file not found")
+        sys.exit(1)
+
     report = createReport(jobs)
     print(report)
 
